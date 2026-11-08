@@ -2,8 +2,7 @@ fastapi
 uvicorn[standard]
 python-multipart
 pillow
-moviepy
+moviepy==1.0.3
 numpy
 gTTS
-python-dotenv
 jinja2

@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pillow
+moviepy
+numpy
+gTTS
+python-dotenv
+jinja2

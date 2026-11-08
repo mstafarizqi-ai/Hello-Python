@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منشئ الفيديوهات بالذكاء الاصطناعي</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <span class="badge">AI Studio</span>
+        <h1>منشئ مقاطع الفيديو بالذكاء الاصطناعي</h1>
+        <p>
+          اكتب فكرة الفيديو، واختر النمط والمدة، ثم أنشئ مقطعًا احترافيًا في ثوانٍ.
+        </p>
+      </header>
+
+      <form id="videoForm" action="/generate" method="post">
+        <div class="field">
+          <label for="title">عنوان الفيديو</label>
+          <input id="title" name="title" type="text" placeholder="مثال: إطلاق منتج جديد" required />
+        </div>
+
+        <div class="field">
+          <label for="prompt">وصف الفيديو</label>
+          <textarea
+            id="prompt"
+            name="prompt"
+            rows="6"
+            placeholder="اكتب قصة الفيديو أو النص الذي تريد أن يشرحها الصوت والمرئيات..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="duration">المدة (ثانية)</label>
+            <input id="duration" name="duration" type="number" min="5" max="60" value="15" />
+          </div>
+
+          <div class="field">
+            <label for="style">النمط</label>
+            <select id="style" name="style">
+              <option value="cinematic">سينمائي</option>
+              <option value="futuristic">مستقبلي</option>
+              <option value="minimal">بسيط</option>
+              <option value="business">تجاري</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="orientation">التنسيق</label>
+          <select id="orientation" name="orientation">
+            <option value="16:9">16:9</option>
+            <option value="9:16">9:16</option>
+            <option value="1:1">1:1</option>
+          </select>
+        </div>
+
+        <button type="submit">إنشاء الفيديو</button>
+      </form>
+
+      <div id="status" class="status hidden"></div>
+
+      <div id="playerWrapper" class="hidden">
+        <video id="videoPlayer" controls></video>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('videoForm');
+      const statusBox = document.getElementById('status');
+      const playerWrapper = document.getElementById('playerWrapper');
+      const player = document.getElementById('videoPlayer');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        statusBox.classList.remove('hidden');
+        statusBox.textContent = 'يتم إنشاء الفيديو، يرجى الانتظار...';
+        statusBox.classList.add('loading');
+
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch('/generate', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.detail || 'حدث خطأ أثناء إنشاء الفيديو.');
+          }
+
+          statusBox.textContent = 'تم إنشاء الفيديو بنجاح';
+          statusBox.classList.remove('loading');
+          statusBox.classList.add('success');
+
+          player.src = result.video_url;
+          playerWrapper.classList.remove('hidden');
+          player.play();
+        } catch (error) {
+          statusBox.textContent = error.message;
+          statusBox.classList.remove('loading');
+          statusBox.classList.add('error');
+        }
+      });
+    </script>
+  </body>
+</html>
+

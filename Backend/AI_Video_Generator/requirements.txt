@@ -1,8 +1,5 @@
 fastapi
 uvicorn[standard]
-python-multipart
-pillow
-moviepy==1.0.3
-numpy
-gTTS
+httpx
+python-dotenv
 jinja2

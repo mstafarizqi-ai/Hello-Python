@@ -1,65 +1,103 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>منشئ الفيديوهات بالذكاء الاصطناعي</title>
-    <link rel="stylesheet" href="/static/styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <header class="hero">
-        <span class="badge">AI STUDIO</span>
-        <h1>حوّل فكرتك إلى فيديو</h1>
-        <p>اكتب وصفًا، اختَر النمط والمدة، وحمّل مقطعك بصيغة MP4.</p>
-      </header>
-      <form id="videoForm">
-        <label for="title">عنوان الفيديو</label>
-        <input id="title" name="title" maxlength="100" placeholder="مثال: إطلاق منتج جديد" required />
-        <label for="prompt">وصف الفيديو أو نص المشاهد</label>
-        <textarea id="prompt" name="prompt" rows="5" maxlength="1500" placeholder="اكتب فكرة الفيديو بالتفصيل..." required></textarea>
-        <div class="grid">
-          <div><label for="duration">المدة (ثانية)</label><input id="duration" name="duration" type="number" min="5" max="60" value="15" required /></div>
-          <div><label for="style">النمط البصري</label><select id="style" name="style"><option value="cinematic">سينمائي</option><option value="futuristic">مستقبلي</option><option value="minimal">بسيط</option><option value="business">تجاري</option></select></div>
-        </div>
-        <label for="orientation">أبعاد الفيديو</label>
-        <select id="orientation" name="orientation"><option value="16:9">أفقي 16:9</option><option value="9:16">عمودي 9:16</option><option value="1:1">مربع 1:1</option></select>
-        <button id="submitButton" type="submit">إنشاء الفيديو</button>
-      </form>
-      <p id="status" class="status hidden" role="status"></p>
-      <section id="result" class="result hidden">
-        <h2>فيديوك جاهز</h2>
-        <video id="player" controls></video>
-        <a id="download" class="download" download>تحميل الفيديو MP4</a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090b12" />
+  <title>Frame — استوديو الفيديو بالذكاء الاصطناعي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-mark">F</span><span>frame<span class="brand-dot">.</span></span></a>
+      <span class="status-pill {% if configured %}ready{% else %}setup{% endif %}"><i></i>{% if configured %}المحرّك متصل{% else %}يلزم إعداد المحرّك{% endif %}</span>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow"><span></span> استوديو صناعة الفيديو</p>
+        <h1>فكرتك، <span>مشهدًا بعد مشهد.</span></h1>
+        <p class="subhead">حوّل وصفك إلى فيديو مولّد بالذكاء الاصطناعي. صِف المشهد، اختر الإخراج، واترك الباقي للاستوديو.</p>
       </section>
-      <p class="note">نسخة تجريبية محلية: تنشئ مشاهد نصية متحركة بصريًا، وقد تضيف تعليقًا صوتيًا عربيًا عند توفر الاتصال بالإنترنت.</p>
+      <div class="workspace">
+        <section class="editor card">
+          <div class="section-heading"><div><span class="step">01</span><h2>صِف الفيديو</h2></div><span class="hint">كلما زادت التفاصيل، كانت النتيجة أفضل</span></div>
+          <form id="videoForm">
+            <label for="title">اسم المشروع</label>
+            <input id="title" name="title" maxlength="100" placeholder="مثال: رحلة إلى مدينة المستقبل" required />
+            <div class="label-row"><label for="prompt">وصف المشهد</label><span id="counter">0 / 2000</span></div>
+            <textarea id="prompt" name="prompt" maxlength="2000" rows="7" placeholder="صِف ما نراه: المكان، حركة الكاميرا، الإضاءة، الأجواء، والأفعال. مثال: لقطة سينمائية لمدينة ساحلية عند الغروب، الكاميرا تحلّق ببطء فوق الأمواج الذهبية..." required></textarea>
+            <div class="section-heading options-heading"><div><span class="step">02</span><h2>إعدادات الإخراج</h2></div></div>
+            <label>الأسلوب البصري</label>
+            <div class="style-options">
+              <label class="style-card"><input type="radio" name="style" value="cinematic" checked /><span class="style-icon">◉</span><span>سينمائي</span></label>
+              <label class="style-card"><input type="radio" name="style" value="commercial" /><span class="style-icon">✧</span><span>إعلاني</span></label>
+              <label class="style-card"><input type="radio" name="style" value="anime" /><span class="style-icon">✳</span><span>أنمي</span></label>
+              <label class="style-card"><input type="radio" name="style" value="documentary" /><span class="style-icon">▣</span><span>وثائقي</span></label>
+            </div>
+            <div class="select-grid">
+              <div><label for="aspect_ratio">نسبة الأبعاد</label><select id="aspect_ratio" name="aspect_ratio"><option value="16:9">أفقي · 16:9</option><option value="9:16">عمودي · 9:16</option><option value="1:1">مربع · 1:1</option></select></div>
+              <div><label for="duration">المدة (ثانية)</label><select id="duration" name="duration"><option value="5">5 ثوانٍ</option><option value="10">10 ثوانٍ</option><option value="15">15 ثانية</option></select></div>
+            </div>
+            <div class="setup-notice {% if configured %}hidden{% endif %}"><strong>خطوة إعداد مطلوبة</strong><span>أضف مفتاح Replicate واسم نموذج فيديو إلى ملف <code>.env</code> لتفعيل التوليد. راجع README للتعليمات.</span></div>
+            <button id="submitButton" class="generate" type="submit" {% if not configured %}disabled{% endif %}><span>✦</span> إنشاء الفيديو <span class="arrow">←</span></button>
+            <p class="fine-print">قد تستغرق عملية التوليد بضع دقائق، وقد تُحتسب تكلفة من مزوّد النموذج.</p>
+          </form>
+        </section>
+        <aside class="preview card">
+          <div class="section-heading"><div><span class="step">03</span><h2>معاينة النتيجة</h2></div></div>
+          <div id="emptyState" class="empty-state"><div class="preview-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="play-icon">▶</div><span class="spark spark-one">✦</span><span class="spark spark-two">✧</span></div><h3>مساحتك الإبداعية</h3><p>الفيديو الذي ستنشئه سيظهر هنا. ابدأ بوصف فكرتك في النموذج.</p></div>
+          <div id="progressState" class="progress-state hidden"><div class="loader-wrap"><div class="loader"></div><span>✦</span></div><h3 id="progressTitle">نحضّر مشهدك</h3><p id="progressMessage">يجري إرسال الطلب إلى محرّك الذكاء الاصطناعي...</p><div class="progress-track"><i></i></div><small>لا تغلق هذه الصفحة حتى يكتمل التوليد</small></div>
+          <div id="videoState" class="video-state hidden"><video id="player" controls playsinline></video><a id="download" class="download" target="_blank" rel="noopener">تحميل الفيديو <span>↓</span></a></div>
+          <div id="errorState" class="error-state hidden"><span>!</span><h3>تعذّر إنشاء الفيديو</h3><p id="errorMessage"></p><button id="retryButton" type="button">حاول مرة أخرى</button></div>
+          <div class="preview-footer"><span>مدعوم بتقنيات توليد الفيديو</span><span class="powered">AI <i>✦</i></span></div>
+        </aside>
+      </div>
     </main>
-    <script>
-      const form = document.getElementById('videoForm');
-      const status = document.getElementById('status');
-      const button = document.getElementById('submitButton');
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        button.disabled = true;
-        status.className = 'status';
-        status.textContent = 'جارٍ إنشاء الفيديو، قد يستغرق ذلك بعض الوقت...';
-        try {
-          const response = await fetch('/generate', { method: 'POST', body: new FormData(form) });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.detail || 'تعذر إنشاء الفيديو.');
-          const url = `${data.video_url}?t=${Date.now()}`;
-          document.getElementById('player').src = url;
-          document.getElementById('download').href = data.video_url;
-          document.getElementById('result').classList.remove('hidden');
-          status.classList.add('success');
-          status.textContent = 'تم إنشاء الفيديو بنجاح.';
-        } catch (error) {
-          status.classList.add('error');
-          status.textContent = error.message;
-        } finally {
-          button.disabled = false;
-        }
-      });
-    </script>
-  </body>
+    <footer><span>FRAME STUDIO</span><span>اصنع شيئًا يستحق المشاهدة.</span></footer>
+  </div>
+<script>
+  const form = document.getElementById('videoForm');
+  const button = document.getElementById('submitButton');
+  const promptField = document.getElementById('prompt');
+  const states = ['emptyState', 'progressState', 'videoState', 'errorState'];
+  let active = false;
+  promptField.addEventListener('input', () => document.getElementById('counter').textContent = `${promptField.value.length} / 2000`);
+  function showState(id) { states.forEach(state => document.getElementById(state).classList.toggle('hidden', state !== id)); }
+  function setError(message) { active = false; button.disabled = false; showState('errorState'); document.getElementById('errorMessage').textContent = message; }
+  async function pollJob(id) {
+    const messages = {starting: 'يجري تجهيز مهمتك...', processing: 'يجري إنشاء اللقطات والحركة...', succeeded: 'اكتمل الفيديو!', failed: 'أخفق إنشاء الفيديو.', canceled: 'أُلغيت المهمة.'};
+    for (let attempt = 0; attempt < 120; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      const response = await fetch(`/api/videos/${encodeURIComponent(id)}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'تعذر التحقق من حالة المهمة.');
+      document.getElementById('progressMessage').textContent = messages[data.status] || 'يجري إنشاء الفيديو...';
+      if (data.status === 'succeeded' && data.video_url) {
+        document.getElementById('player').src = data.video_url;
+        document.getElementById('download').href = data.video_url;
+        showState('videoState'); active = false; button.disabled = false; return;
+      }
+      if (['failed', 'canceled'].includes(data.status)) throw new Error(data.error || 'لم ينجح التوليد. تحقق من إعدادات النموذج وحاول مجددًا.');
+    }
+    throw new Error('استغرق التوليد وقتًا أطول من المتوقع. تحقق من المهمة في لوحة Replicate.');
+  }
+  form.addEventListener('submit', async event => {
+    event.preventDefault(); if (active) return;
+    active = true; button.disabled = true; showState('progressState');
+    try {
+      const values = Object.fromEntries(new FormData(form));
+      values.duration = Number(values.duration);
+      const response = await fetch('/api/videos', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(values)});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'تعذر بدء إنشاء الفيديو.');
+      await pollJob(data.id);
+    } catch (error) { setError(error.message); }
+  });
+  document.getElementById('retryButton').addEventListener('click', () => showState('emptyState'));
+</script>
+</body>
 </html>
